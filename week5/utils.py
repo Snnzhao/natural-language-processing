@@ -2,6 +2,7 @@ import nltk
 import pickle
 import re
 import numpy as np
+import pandas as pd
 
 nltk.download('stopwords')
 from nltk.corpus import stopwords
@@ -42,17 +43,12 @@ def load_embeddings(embeddings_path):
     # Hint: you have already implemented a similar routine in the 3rd assignment.
     # Note that here you also need to know the dimension of the loaded embeddings.
     # When you load the embeddings, use numpy.float32 type as dtype
-
-    ########################
-    #### YOUR CODE HERE ####
-    ########################
-
-    # remove this when you're done
-    raise NotImplementedError(
-        "Open utils.py and fill with your code. In case of Google Colab, download"
-        "(https://github.com/hse-aml/natural-language-processing/blob/master/project/utils.py), "
-        "edit locally and upload using '> arrow on the left edge' -> Files -> UPLOAD")
-
+    starspace_list =np.array(pd.read_csv(embeddings_path, sep='\t',header=None)) 
+    embeddings={}
+    for embeding in starspace_list:
+        embeddings[embeding[0]]=embeding[1:]
+    embeddings_dim=len(starspace_list[0][1:])
+    return embeddings,embeddings_dim
 
 def question_to_vec(question, embeddings, dim):
     """Transforms a string to an embedding by averaging word embeddings."""
@@ -63,11 +59,11 @@ def question_to_vec(question, embeddings, dim):
     #### YOUR CODE HERE ####
     ########################
 
-    # remove this when you're done
-    raise NotImplementedError(
-        "Open utils.py and fill with your code. In case of Google Colab, download"
-        "(https://github.com/hse-aml/natural-language-processing/blob/master/project/utils.py), "
-        "edit locally and upload using '> arrow on the left edge' -> Files -> UPLOAD")
+    wordlist=question.split()
+    embedlist=[embeddings[word] for word in wordlist if word in embeddings]
+    if len(embedlist)==0:
+        return np.zeros(dim)
+    return np.mean(embedlist,axis=0)
 
 
 def unpickle_file(filename):
